@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 #
 # Usage:
 #   ./zabbix-slack.sh $1 $2 $3
@@ -7,8 +7,16 @@
 #     $3 ... Message on Slack
 #
 
-WEBHOOK_URL='%SLACK_WEB_HOOK_URL%'
+LOGFILE='/var/log/zabbix/zabbix_slack.log'
+CURRDIR=$(cd $(dirname $0);pwd)
+WEBHOOK_URL='%YOUR_SLACK_WEBHOOK_URL%'
 USERNAME='Zabbix'
+
+function log {
+  echo `date +'%Y/%m/%d %H:%M:%S'` "[$0] $1" >> $LOGFILE
+}
+
+log "<START>"
 
 LF=$(printf '\\\012_')
 LF=${LF%_}
@@ -38,6 +46,7 @@ fi
 
 payload="payload={\"channel\":\"${TO}\",\"username\":\"${USERNAME}\",\"attachments\":[{\"title\":\"${SUBJECT}\",\"text\":\"${BODY}\",\"color\":\"${COLOR}\"}]}"
 payload=${payload//"/\\"}
-curl -m 10 --data-urlencode "${payload}" $WEBHOOK_URL
-
-exit 0
+log "${payload}"
+res=$(curl -m 5 --data-urlencode "${payload}" $WEBHOOK_URL)
+log "cURL Response=${res}"
+log "<END>"
