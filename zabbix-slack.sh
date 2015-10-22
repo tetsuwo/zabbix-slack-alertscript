@@ -26,9 +26,15 @@ SUBJECT="$2"
 BODY="$3"
 COLOR='#000000'
 
-BODY=${BODY//
-/}
+SUBJECT=${SUBJECT//^M/}
+SUBJECT=${SUBJECT//$LF/\\n}
+SUBJECT=${SUBJECT//\"/\\\"}
+BODY=${BODY//^M/}
 BODY=${BODY//$LF/\\n}
+BODY=${BODY//\"/\\\"}
+
+log "subject=${SUBJECT}"
+log "body=${BODY}"
 
 if echo "${SUBJECT}" | grep 'RECOVERY'; then
     COLOR='#1e90ff'
